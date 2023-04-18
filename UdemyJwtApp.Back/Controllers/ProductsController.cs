@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using UdemyJwtApp.Back.Core.Application.Features.CQRS.Commands;
 using UdemyJwtApp.Back.Core.Application.Features.CQRS.Queries;
 
 namespace UdemyJwtApp.Back.Controllers
@@ -21,6 +22,28 @@ namespace UdemyJwtApp.Back.Controllers
         {
             var result = await this.mediator.Send(new GetAllProductsQueryRequest());
             return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+
+        public async Task<IActionResult> Get(int id)
+        {
+            var result = await this.mediator.Send(new GetProductQueryRequest(id));
+            return result == null ? NotFound() : Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await this.mediator.Send(new DeleteProductCommandRequest(id));
+            return NoContent();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateProductCommandRequest request)
+        {
+            await this.mediator.Send(request);
+            return Created("", request);
         }
     }
 }
